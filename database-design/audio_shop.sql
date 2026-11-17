@@ -1,109 +1,133 @@
 -- ============================================================
 -- audio_shop.sql
--- Skema + data contoh untuk prototipe Toko Online Produk Audio
+-- Skema + data contoh untuk prototipe SoundHub
 -- Target: MySQL 8.x
--- Cara pakai:  mysql -u root -p < audio_shop.sql
+-- Cara pakai: mysql -u root -p < audio_shop.sql
 -- ============================================================
 
 DROP DATABASE IF EXISTS audio_shop;
 CREATE DATABASE audio_shop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE audio_shop;
 
+SET NAMES utf8mb4;
+
 -- ------------------------------------------------------------
 -- 1. SKEMA
 -- ------------------------------------------------------------
+
+CREATE TABLE categories (
+  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL UNIQUE,
+  slug       VARCHAR(120) NOT NULL UNIQUE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE brands (
+  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  name       VARCHAR(100) NOT NULL UNIQUE,
+  slug       VARCHAR(120) NOT NULL UNIQUE,
+  logo_url   VARCHAR(255) NULL,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE products (
+  id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  category_id BIGINT UNSIGNED NOT NULL,
+  brand_id    BIGINT UNSIGNED NOT NULL,
+  title       VARCHAR(200) NOT NULL,
+  slug        VARCHAR(220) NOT NULL UNIQUE,
+  description TEXT NULL,
+  image_url   VARCHAR(255) NOT NULL,
+  sold_count  INT UNSIGNED NOT NULL DEFAULT 0,
+  is_active   TINYINT(1) NOT NULL DEFAULT 1,
+  created_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id),
+  CONSTRAINT fk_products_brand    FOREIGN KEY (brand_id)    REFERENCES brands(id),
+  INDEX idx_products_trending (is_active, sold_count, created_at),
+  INDEX idx_products_title (title)
+) ENGINE=InnoDB;
+
+CREATE TABLE product_variants (
+  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  product_id BIGINT UNSIGNED NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  sku        VARCHAR(50) NOT NULL UNIQUE,
+  price      DECIMAL(12,2) NOT NULL,
+  stock      INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_variants_product FOREIGN KEY (product_id)
+    REFERENCES products(id) ON DELETE CASCADE,
+  UNIQUE KEY uq_variant_product_name (product_id, name),
+  CONSTRAINT chk_variant_price CHECK (price >= 0)
+) ENGINE=InnoDB;
 
 CREATE TABLE users (
   id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   name          VARCHAR(100) NOT NULL,
   email         VARCHAR(150) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
-CREATE TABLE brands (
-  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name       VARCHAR(100) NOT NULL UNIQUE,
-  slug       VARCHAR(120) NOT NULL UNIQUE,
-  logo_url   VARCHAR(255) NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE categories (
-  id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  name       VARCHAR(100) NOT NULL UNIQUE,
-  slug       VARCHAR(120) NOT NULL UNIQUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE products (
-  id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  brand_id    INT UNSIGNED NOT NULL,
-  category_id INT UNSIGNED NOT NULL,
-  name        VARCHAR(200) NOT NULL,
-  slug        VARCHAR(220) NOT NULL UNIQUE,
-  description TEXT NULL,
-  base_price  DECIMAL(12,2) NOT NULL,           -- harga mulai dari (IDR)
-  sold_count  INT UNSIGNED NOT NULL DEFAULT 0,  -- dasar penentuan trending
-  is_active   TINYINT(1) NOT NULL DEFAULT 1,
-  created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  CONSTRAINT fk_products_brand    FOREIGN KEY (brand_id)    REFERENCES brands(id),
-  CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id),
-  INDEX idx_products_sold (sold_count),
-  INDEX idx_products_name (name)
-);
-
-CREATE TABLE product_variants (
-  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  product_id BIGINT UNSIGNED NOT NULL,
-  sku        VARCHAR(60) NOT NULL UNIQUE,
-  name       VARCHAR(100) NOT NULL,             -- contoh: Hitam, Putih, Biru
-  price      DECIMAL(12,2) NOT NULL,
-  stock      INT UNSIGNED NOT NULL DEFAULT 0,
-  CONSTRAINT fk_variants_product FOREIGN KEY (product_id)
-    REFERENCES products(id) ON DELETE CASCADE
-);
-
-CREATE TABLE product_images (
-  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  product_id BIGINT UNSIGNED NOT NULL,
-  image_url  VARCHAR(255) NOT NULL,
-  is_primary TINYINT(1) NOT NULL DEFAULT 0,
-  sort_order INT NOT NULL DEFAULT 0,
-  CONSTRAINT fk_images_product FOREIGN KEY (product_id)
-    REFERENCES products(id) ON DELETE CASCADE
-);
+  created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
 CREATE TABLE carts (
   id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  user_id    BIGINT UNSIGNED NOT NULL UNIQUE,   -- satu user, satu keranjang
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  user_id    BIGINT UNSIGNED NOT NULL UNIQUE,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT fk_carts_user FOREIGN KEY (user_id)
     REFERENCES users(id) ON DELETE CASCADE
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE cart_items (
   id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   cart_id    BIGINT UNSIGNED NOT NULL,
   variant_id BIGINT UNSIGNED NOT NULL,
   qty        INT UNSIGNED NOT NULL DEFAULT 1,
-  added_at   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uq_cart_variant (cart_id, variant_id),  -- cegah baris ganda
-  CONSTRAINT fk_items_cart    FOREIGN KEY (cart_id)    REFERENCES carts(id) ON DELETE CASCADE,
-  CONSTRAINT fk_items_variant FOREIGN KEY (variant_id) REFERENCES product_variants(id)
-);
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_cart_variant (cart_id, variant_id),
+  CONSTRAINT fk_items_cart FOREIGN KEY (cart_id)
+    REFERENCES carts(id) ON DELETE CASCADE,
+  CONSTRAINT fk_items_variant FOREIGN KEY (variant_id)
+    REFERENCES product_variants(id),
+  CONSTRAINT chk_cart_qty CHECK (qty >= 1)
+) ENGINE=InnoDB;
 
--- Opsional: agar logout benar-benar mencabut JWT
-CREATE TABLE revoked_tokens (
-  id         BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  token_jti  VARCHAR(64) NOT NULL UNIQUE,
-  user_id    BIGINT UNSIGNED NOT NULL,
-  expires_at DATETIME NOT NULL,
-  CONSTRAINT fk_revoked_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-);
+CREATE TABLE transactions (
+  id               BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  invoice_no       VARCHAR(30) NOT NULL UNIQUE,
+  user_id          BIGINT UNSIGNED NOT NULL,
+  total_amount     DECIMAL(12,2) NOT NULL,
+  status           ENUM('pending','paid','shipped','completed','cancelled')
+                   NOT NULL DEFAULT 'pending',
+  payment_method   VARCHAR(50) NOT NULL,
+  shipping_address TEXT NOT NULL,
+  created_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at       TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_transactions_user FOREIGN KEY (user_id) REFERENCES users(id),
+  INDEX idx_transactions_user (user_id, created_at),
+  CONSTRAINT chk_transaction_total CHECK (total_amount >= 0)
+) ENGINE=InnoDB;
+
+CREATE TABLE transaction_items (
+  id             BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  transaction_id BIGINT UNSIGNED NOT NULL,
+  variant_id     BIGINT UNSIGNED NOT NULL,
+  product_title  VARCHAR(200) NOT NULL,
+  variant_name   VARCHAR(100) NOT NULL,
+  price          DECIMAL(12,2) NOT NULL,
+  qty            INT UNSIGNED NOT NULL,
+  subtotal       DECIMAL(12,2) NOT NULL,
+  CONSTRAINT fk_transaction_items_transaction FOREIGN KEY (transaction_id)
+    REFERENCES transactions(id) ON DELETE CASCADE,
+  CONSTRAINT fk_transaction_items_variant FOREIGN KEY (variant_id)
+    REFERENCES product_variants(id),
+  CONSTRAINT chk_transaction_item_qty CHECK (qty >= 1),
+  CONSTRAINT chk_transaction_item_price CHECK (price >= 0),
+  CONSTRAINT chk_transaction_item_subtotal CHECK (subtotal >= 0)
+) ENGINE=InnoDB;
 
 -- ------------------------------------------------------------
 -- 2. DATA CONTOH (SEED)
@@ -120,111 +144,129 @@ INSERT INTO brands (id, name, slug) VALUES
   (8, 'Ugreen',     'ugreen');
 
 INSERT INTO categories (id, name, slug) VALUES
-  (1, 'Headphone',       'headphone'),
-  (2, 'Earphone / TWS',  'earphone-tws'),
-  (3, 'Speaker',         'speaker'),
-  (4, 'Aksesoris',       'aksesoris');
+  (1, 'Headphone',      'headphone'),
+  (2, 'Earphone / TWS', 'earphone-tws'),
+  (3, 'Speaker',        'speaker'),
+  (4, 'Aksesoris',      'aksesoris');
 
--- sold_count sengaja dibuat bervariasi agar 5 trending terlihat jelas
-INSERT INTO products (id, brand_id, category_id, name, slug, description, base_price, sold_count) VALUES
-  (1,  1, 1, 'Sony WH-1000XM5', 'sony-wh-1000xm5',
-       'Headphone nirkabel dengan noise cancelling terbaik di kelasnya, baterai hingga 30 jam, dan suara jernih untuk musik maupun panggilan.',
-       5499000, 980),
-  (2,  2, 1, 'Sennheiser HD 560S', 'sennheiser-hd-560s',
-       'Headphone open-back berkabel dengan suara natural dan luas, cocok untuk pendengar audiophile di rumah.',
-       1999000, 240),
-  (3,  3, 2, 'Apple AirPods Pro', 'apple-airpods-pro',
-       'Earbuds nirkabel dengan Active Noise Cancellation, mode Transparency, dan casing pengisian MagSafe.',
-       3999000, 1250),
-  (4,  4, 2, 'Samsung Galaxy Buds2 Pro', 'samsung-galaxy-buds2-pro',
-       'TWS dengan audio 24-bit Hi-Fi, ANC cerdas, dan desain ergonomis yang nyaman dipakai lama.',
-       2799000, 760),
-  (5,  5, 3, 'JBL Flip 6', 'jbl-flip-6',
-       'Speaker Bluetooth portabel tahan air dan debu IP67 dengan bass bertenaga dan baterai hingga 12 jam.',
-       1799000, 1420),
-  (6,  6, 3, 'Bose SoundLink Flex', 'bose-soundlink-flex',
-       'Speaker Bluetooth tangguh dengan suara jernih dan postur seimbang, tahan air dan debu.',
-       2699000, 540),
-  (7,  7, 1, 'Anker Soundcore Life Q30', 'anker-soundcore-life-q30',
-       'Headphone ANC hybrid dengan baterai hingga 40 jam dengan harga yang bersahabat.',
-       1099000, 890),
-  (8,  8, 4, 'Ugreen DAC Mini USB-C', 'ugreen-dac-mini-usb-c',
-       'Adaptor DAC USB-C ke jack 3.5mm untuk meningkatkan kualitas suara dari ponsel atau laptop.',
-       199000, 310),
-  (9,  5, 2, 'JBL Tune 230NC TWS', 'jbl-tune-230nc-tws',
-       'Earbuds nirkabel dengan ANC, JBL Pure Bass Sound, dan total baterai hingga 40 jam dengan casing.',
-       1299000, 1100),
-  (10, 1, 2, 'Sony WF-1000XM5', 'sony-wf-1000xm5',
-       'TWS premium dengan noise cancelling unggulan dan ukuran yang lebih kecil dan nyaman.',
-       3999000, 670),
-  (11, 7, 3, 'Anker Soundcore Motion+', 'anker-soundcore-motion-plus',
-       'Speaker Bluetooth dengan audio Hi-Res 30W dan baterai hingga 12 jam.',
-       1599000, 420),
-  (12, 8, 4, 'Ugreen Kabel Audio 3.5mm', 'ugreen-kabel-audio-3-5mm',
-       'Kabel audio AUX 3.5mm berlapis nilon, kuat dan minim gangguan sinyal.',
-       79000, 200);
+-- sold_count mengikuti urutan produk trending pada prototipe UI
+INSERT INTO products
+  (id, category_id, brand_id, title, slug, description, image_url, sold_count, is_active)
+VALUES
+  (1, 1, 1, 'Sony WH-1000XM5', 'sony-wh-1000xm5',
+   'Headphone over-ear dengan noise cancelling adaptif, driver 30 mm, dan baterai hingga 30 jam.',
+   '/assets/sony-wh-1000xm5.webp', 1240, 1),
+  (2, 2, 3, 'Apple AirPods Pro 2', 'apple-airpods-pro-2',
+   'TWS dengan active noise cancellation, audio spatial, dan baterai hingga 6 jam.',
+   '/assets/airpods-pro-2.webp', 1080, 1),
+  (3, 3, 5, 'JBL Flip 6', 'jbl-flip-6',
+   'Speaker portabel tahan air IP67 dengan driver racetrack dan baterai 12 jam.',
+   '/assets/jbl-flip-6.webp', 960, 1),
+  (4, 4, 8, 'Ugreen RCA Audio Cable', 'ugreen-rca-audio-cable',
+   'Kabel audio RCA stereo 2RCA ke 2RCA dengan konektor berlapis emas.',
+   '/assets/ugreen-rca-cable.webp', 840, 1),
+  (5, 1, 2, 'Sennheiser HD 560S', 'sennheiser-hd-560s',
+   'Headphone open-back untuk mixing dan mendengarkan detail, driver 38 mm.',
+   '/assets/sennheiser-hd-560s.webp', 720, 1),
+  (6, 2, 4, 'Samsung Galaxy Buds2 Pro', 'samsung-galaxy-buds2-pro',
+   'TWS dengan audio 24-bit Hi-Fi, ANC cerdas, dan desain ergonomis.',
+   '/images/products/samsung-galaxy-buds2-pro.webp', 610, 1),
+  (7, 3, 6, 'Bose SoundLink Flex', 'bose-soundlink-flex',
+   'Speaker Bluetooth tangguh dengan suara jernih, tahan air dan debu.',
+   '/images/products/bose-soundlink-flex.webp', 540, 1),
+  (8, 1, 7, 'Anker Soundcore Life Q30', 'anker-soundcore-life-q30',
+   'Headphone ANC hybrid dengan baterai hingga 40 jam.',
+   '/images/products/anker-soundcore-life-q30.webp', 480, 1);
 
-INSERT INTO product_variants (product_id, sku, name, price, stock) VALUES
-  (1,  'SONY-XM5-BLK',  'Hitam',        5499000, 25),
-  (1,  'SONY-XM5-SLV',  'Silver',       5499000, 18),
-  (1,  'SONY-XM5-BLU',  'Biru Midnight',5699000, 10),
-  (2,  'SENN-560S-BLK', 'Hitam',        1999000, 12),
-  (3,  'APL-APP-WHT',   'Putih',        3999000, 40),
-  (3,  'APL-APP-WHT-C', 'Putih + Casing USB-C', 4299000, 22),
-  (4,  'SAM-GB2P-GRP',  'Graphite',     2799000, 30),
-  (4,  'SAM-GB2P-WHT',  'Putih',        2799000, 26),
-  (4,  'SAM-GB2P-VLT',  'Bora Purple',  2899000, 14),
-  (5,  'JBL-F6-BLK',    'Hitam',        1799000, 50),
-  (5,  'JBL-F6-RED',    'Merah',        1799000, 35),
-  (5,  'JBL-F6-BLU',    'Biru',         1799000, 28),
-  (6,  'BOSE-SLF-BLK',  'Hitam',        2699000, 20),
-  (6,  'BOSE-SLF-WHT',  'Putih',        2699000, 15),
-  (7,  'ANK-Q30-BLK',   'Hitam',        1099000, 45),
-  (7,  'ANK-Q30-BLU',   'Biru',         1099000, 30),
-  (7,  'ANK-Q30-PNK',   'Pink',         1149000, 12),
-  (8,  'UGR-DAC-BLK',   'Hitam',         199000, 80),
-  (8,  'UGR-DAC-SLV',   'Silver',        199000, 60),
-  (9,  'JBL-T230-BLK',  'Hitam',        1299000, 55),
-  (9,  'JBL-T230-WHT',  'Putih',        1299000, 40),
-  (9,  'JBL-T230-BLU',  'Biru',         1299000, 25),
-  (10, 'SONY-WF5-BLK',  'Hitam',        3999000, 20),
-  (10, 'SONY-WF5-SLV',  'Silver',       3999000, 16),
-  (11, 'ANK-MOT-BLK',   'Hitam',        1599000, 22),
-  (11, 'ANK-MOT-GRY',   'Abu-abu',      1599000, 18),
-  (12, 'UGR-AUX-1M',    '1 meter',        79000, 120),
-  (12, 'UGR-AUX-2M',    '2 meter',        99000, 90);
+INSERT INTO product_variants (product_id, name, sku, price, stock) VALUES
+  (1, 'Hitam',         'SONY-XM5-BLK', 4499000, 12),
+  (1, 'Perak',         'SONY-XM5-SLV', 4599000,  5),
+  (1, 'Midnight Blue', 'SONY-XM5-BLU', 4699000,  7),
+  (2, 'USB-C',         'APL-APP2-USBC', 3499000, 18),
+  (2, 'Lightning',     'APL-APP2-LTN',  3499000,  6),
+  (3, 'Hitam',         'JBL-F6-BLK',    1599000,  9),
+  (3, 'Biru',          'JBL-F6-BLU',    1599000,  4),
+  (4, '1 m',           'UGR-RCA-1M',      99000, 40),
+  (4, '2 m',           'UGR-RCA-2M',     119000, 25),
+  (4, '3 m',           'UGR-RCA-3M',     139000, 10),
+  (5, 'Hitam',         'SENN-560S-BLK', 2899000,  8),
+  (5, 'Hitam + Pouch', 'SENN-560S-PCH', 3199000,  4),
+  (6, 'Graphite',      'SAM-GB2P-GRP',  2799000, 30),
+  (6, 'Putih',         'SAM-GB2P-WHT',  2799000, 26),
+  (7, 'Hitam',         'BOSE-SLF-BLK',  2699000, 20),
+  (7, 'Putih',         'BOSE-SLF-WHT',  2699000, 15),
+  (8, 'Hitam',         'ANK-Q30-BLK',   1099000, 45),
+  (8, 'Biru',          'ANK-Q30-BLU',   1099000, 30);
 
--- URL gambar bersifat placeholder; ganti dengan path gambar sebenarnya
-INSERT INTO product_images (product_id, image_url, is_primary, sort_order) VALUES
-  (1,  '/images/products/sony-wh-1000xm5-1.jpg',        1, 0),
-  (1,  '/images/products/sony-wh-1000xm5-2.jpg',        0, 1),
-  (2,  '/images/products/sennheiser-hd-560s-1.jpg',     1, 0),
-  (3,  '/images/products/apple-airpods-pro-1.jpg',      1, 0),
-  (3,  '/images/products/apple-airpods-pro-2.jpg',      0, 1),
-  (4,  '/images/products/galaxy-buds2-pro-1.jpg',       1, 0),
-  (5,  '/images/products/jbl-flip-6-1.jpg',             1, 0),
-  (5,  '/images/products/jbl-flip-6-2.jpg',             0, 1),
-  (6,  '/images/products/bose-soundlink-flex-1.jpg',    1, 0),
-  (7,  '/images/products/anker-q30-1.jpg',              1, 0),
-  (8,  '/images/products/ugreen-dac-mini-1.jpg',        1, 0),
-  (9,  '/images/products/jbl-tune-230nc-1.jpg',         1, 0),
-  (10, '/images/products/sony-wf-1000xm5-1.jpg',        1, 0),
-  (11, '/images/products/anker-motion-plus-1.jpg',      1, 0),
-  (12, '/images/products/ugreen-aux-cable-1.jpg',       1, 0);
-
--- Catatan: tabel users dikosongkan. Akun dibuat lewat fitur Signup
--- (password harus di-hash dengan bcrypt oleh aplikasi, bukan disimpan polos).
+-- Tabel users sengaja kosong. Akun dibuat lewat Signup dan password
+-- harus di-hash dengan bcrypt oleh aplikasi, bukan disimpan sebagai teks asli.
 
 -- ------------------------------------------------------------
 -- 3. QUERY REFERENSI
 -- ------------------------------------------------------------
 
--- 5 produk trending (Home)
--- SELECT p.id, p.name, p.slug, p.base_price, b.name AS brand,
---        (SELECT image_url FROM product_images
---          WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS image
--- FROM products p
--- JOIN brands b ON b.id = p.brand_id
--- WHERE p.is_active = 1
--- ORDER BY p.sold_count DESC
--- LIMIT 5;
+-- 5 produk trending (Dashboard)
+-- Harga memakai varian termurah, bukan kolom harga di tabel products.
+SELECT p.id, p.title, p.slug, p.image_url, b.name AS brand,
+       (SELECT MIN(v.price) FROM product_variants v
+         WHERE v.product_id = p.id) AS price_from
+FROM products p
+JOIN brands b ON b.id = p.brand_id
+WHERE p.is_active = 1
+ORDER BY p.sold_count DESC, p.created_at DESC
+LIMIT 5;
+
+-- Pencarian berdasarkan judul produk atau nama merek
+SELECT p.id, p.title, p.slug, p.image_url, b.name AS brand,
+       (SELECT MIN(v.price) FROM product_variants v
+         WHERE v.product_id = p.id) AS price_from
+FROM products p
+JOIN brands b ON b.id = p.brand_id
+WHERE p.is_active = 1
+  AND (p.title LIKE CONCAT('%', ?, '%')
+    OR b.name LIKE CONCAT('%', ?, '%'))
+ORDER BY p.sold_count DESC;
+
+-- Detail produk beserta seluruh varian
+SELECT p.id, p.title, p.slug, p.description, p.image_url,
+       b.name AS brand, c.name AS category,
+       v.id AS variant_id, v.name AS variant_name, v.sku, v.price, v.stock
+FROM products p
+JOIN brands b ON b.id = p.brand_id
+JOIN categories c ON c.id = p.category_id
+JOIN product_variants v ON v.product_id = p.id
+WHERE p.slug = ? AND p.is_active = 1
+ORDER BY v.price, v.id;
+
+-- Isi keranjang milik pengguna
+SELECT ci.id, p.title, v.name AS variant_name, v.price, ci.qty,
+       (v.price * ci.qty) AS subtotal
+FROM carts c
+JOIN cart_items ci ON ci.cart_id = c.id
+JOIN product_variants v ON v.id = ci.variant_id
+JOIN products p ON p.id = v.product_id
+WHERE c.user_id = ?
+ORDER BY ci.created_at;
+
+-- Riwayat transaksi milik pengguna
+SELECT t.invoice_no, t.total_amount, t.status, t.payment_method,
+       t.shipping_address, t.created_at
+FROM transactions t
+WHERE t.user_id = ?
+ORDER BY t.created_at DESC;
+
+-- Rincian item dalam satu transaksi
+SELECT ti.product_title, ti.variant_name, ti.price, ti.qty, ti.subtotal
+FROM transaction_items ti
+JOIN transactions t ON t.id = ti.transaction_id
+WHERE t.invoice_no = ?;
+
+-- Alur checkout harus dijalankan dalam satu transaksi database:
+-- START TRANSACTION;
+--   INSERT INTO transactions (...) VALUES (...);
+--   INSERT INTO transaction_items (...)
+--     SELECT ... FROM cart_items ...;
+--   UPDATE product_variants ... SET stock = stock - qty;
+--   UPDATE products ... SET sold_count = sold_count + qty;
+--   DELETE FROM cart_items WHERE cart_id = ?;
+-- COMMIT;
