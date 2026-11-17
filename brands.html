@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Brand — SoundHub</title>
+  <meta name="description" content="Daftar brand audio di SoundHub: Sony, Apple, JBL, Sennheiser, dan Ugreen.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <a class="skip" href="#main">Lewati ke konten</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Sound<span>Hub</span></a>
+      <nav class="primary-nav" aria-label="Navigasi utama">
+        <a href="index.html">Home</a>
+        <a href="categories.html">Kategori</a>
+        <a href="brands.html" aria-current="page">Brand</a>
+      </nav>
+      <form class="search" action="search.html" role="search">
+        <label class="sr-only" for="q">Cari produk audio</label>
+        <input id="q" name="q" type="search" placeholder="Cari headphone, speaker…" required>
+        <button type="submit" aria-label="Cari"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+      </form>
+      <div class="header-actions">
+        <a class="cart" href="cart.html" aria-label="Keranjang belanja"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></a>
+        <a class="btn btn-small btn-ghost" href="login.html">Masuk</a>
+        <a class="btn btn-small" href="signup.html">Daftar</a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="container page">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><span>Brand</span></nav>
+    <header class="page-head">
+      <div><p class="eyebrow">Brand pilihan</p><h1>Brand</h1></div>
+      <p class="lead">Brand audio yang kami kurasi untuk kebutuhan mendengarkan sehari-hari.</p>
+    </header>
+    <nav class="brand-grid" aria-label="Daftar brand">
+      <a class="brand-tile" href="#sony"><span class="brand-mark">S</span><span><strong>Sony</strong><small>1 produk</small></span></a>
+      <a class="brand-tile" href="#apple"><span class="brand-mark">A</span><span><strong>Apple</strong><small>1 produk</small></span></a>
+      <a class="brand-tile" href="#jbl"><span class="brand-mark">J</span><span><strong>JBL</strong><small>1 produk</small></span></a>
+      <a class="brand-tile" href="#sennheiser"><span class="brand-mark">S</span><span><strong>Sennheiser</strong><small>1 produk</small></span></a>
+      <a class="brand-tile" href="#ugreen"><span class="brand-mark">U</span><span><strong>Ugreen</strong><small>1 produk</small></span></a>
+    </nav>
+    <section class="section" aria-labelledby="brand-products">
+      <div class="section-head"><h2 id="brand-products">Semua produk</h2><span class="muted">5 produk</span></div>
+      <div class="product-grid">
+        <article class="card" id="sony">
+          <a class="card-media" href="product.html"><img src="assets/sony-wh-1000xm5.webp" alt="Headphone Sony WH-1000XM5 warna hitam" width="900" height="900"></a>
+          <p class="eyebrow">Sony · Headphone</p>
+          <h3><a href="product.html">Sony WH-1000XM5</a></h3>
+          <p class="price"><data value="4499000">Rp4.499.000</data></p>
+        </article>
+        <article class="card" id="apple">
+          <a class="card-media" href="product-airpods-pro-2.html"><img src="assets/airpods-pro-2.webp" alt="Apple AirPods Pro 2 dengan case pengisian" width="900" height="900"></a>
+          <p class="eyebrow">Apple · TWS</p>
+          <h3><a href="product-airpods-pro-2.html">Apple AirPods Pro 2</a></h3>
+          <p class="price"><data value="3499000">Rp3.499.000</data></p>
+        </article>
+        <article class="card" id="jbl">
+          <a class="card-media" href="product-jbl-flip-6.html"><img src="assets/jbl-flip-6.webp" alt="Speaker portabel JBL Flip 6 warna hitam" width="900" height="900"></a>
+          <p class="eyebrow">JBL · Speaker</p>
+          <h3><a href="product-jbl-flip-6.html">JBL Flip 6</a></h3>
+          <p class="price"><data value="1599000">Rp1.599.000</data></p>
+        </article>
+        <article class="card" id="sennheiser">
+          <a class="card-media" href="product-sennheiser-hd-560s.html"><img src="assets/sennheiser-hd-560s.webp" alt="Headphone Sennheiser HD 560S warna abu-abu" width="900" height="900"></a>
+          <p class="eyebrow">Sennheiser · Headphone</p>
+          <h3><a href="product-sennheiser-hd-560s.html">Sennheiser HD 560S</a></h3>
+          <p class="price"><data value="2899000">Rp2.899.000</data></p>
+        </article>
+        <article class="card" id="ugreen">
+          <a class="card-media" href="product-ugreen-rca-cable.html"><img src="assets/ugreen-rca-cable.webp" alt="Kabel audio RCA Ugreen dengan konektor berwarna" width="900" height="900"></a>
+          <p class="eyebrow">Ugreen · Aksesoris</p>
+          <h3><a href="product-ugreen-rca-cable.html">Ugreen RCA Audio Cable</a></h3>
+          <p class="price"><data value="99000">Rp99.000</data></p>
+        </article>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><a class="logo" href="index.html">Sound<span>Hub</span></a><p>Audio yang tepat untuk setiap ruang dan ritme.</p></div>
+      <nav class="footer-nav" aria-label="Navigasi footer"><a href="categories.html">Kategori</a><a href="brands.html">Brand</a><a href="cart.html">Keranjang</a><a href="login.html">Masuk</a></nav><p>© 2026 SoundHub. Prototipe UI.</p>
+    </div>
+  </footer>
+</body>
+</html>

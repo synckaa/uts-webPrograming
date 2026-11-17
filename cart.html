@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keranjang — SoundHub</title>
+  <meta name="description" content="Keranjang belanja SoundHub. Tinjau item, jumlah, dan subtotal sebelum checkout.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <a class="skip" href="#main">Lewati ke konten</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Sound<span>Hub</span></a>
+      <nav class="primary-nav" aria-label="Navigasi utama">
+        <a href="index.html">Home</a>
+        <a href="categories.html">Kategori</a>
+        <a href="brands.html">Brand</a>
+      </nav>
+      <form class="search" action="search.html" role="search">
+        <label class="sr-only" for="q">Cari produk audio</label>
+        <input id="q" name="q" type="search" placeholder="Cari headphone, speaker…" required>
+        <button type="submit" aria-label="Cari"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+      </form>
+      <div class="header-actions">
+        <a class="cart" href="cart.html" aria-label="Keranjang belanja, 2 item"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg><span class="badge">2</span></a>
+        <span class="user-name">Hai, Raka</span>
+        <a class="btn btn-small btn-ghost" href="index.html">Keluar</a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="container page">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span>/</span><span>Keranjang</span></nav>
+    <header class="page-head">
+      <div><p class="eyebrow">Langkah terakhir</p><h1>Keranjang</h1></div>
+      <p class="lead">2 item siap ditinjau. Harga sudah dalam Rupiah.</p>
+    </header>
+    <div class="cart-layout">
+      <section class="cart-list" aria-label="Item di keranjang">
+        <article class="cart-item">
+          <a href="product.html"><img src="assets/sony-wh-1000xm5.webp" alt="Headphone Sony WH-1000XM5 warna hitam" width="900" height="900"></a>
+          <div>
+            <h2><a href="product.html">Sony WH-1000XM5</a></h2>
+            <p class="muted">Hitam · Sony</p>
+            <p class="price"><data value="4499000">Rp4.499.000</data></p>
+          </div>
+          <div class="cart-actions">
+            <label class="qty">Jumlah <input type="number" value="1" min="1" max="12" aria-label="Jumlah Sony WH-1000XM5"></label>
+            <a class="remove" href="cart.html" aria-label="Hapus Sony WH-1000XM5 dari keranjang">Hapus</a>
+          </div>
+        </article>
+        <article class="cart-item">
+          <a href="product-jbl-flip-6.html"><img src="assets/jbl-flip-6.webp" alt="Speaker portabel JBL Flip 6 warna hitam" width="900" height="900"></a>
+          <div>
+            <h2><a href="product-jbl-flip-6.html">JBL Flip 6</a></h2>
+            <p class="muted">Biru · JBL</p>
+            <p class="price"><data value="1599000">Rp1.599.000</data></p>
+          </div>
+          <div class="cart-actions">
+            <label class="qty">Jumlah <input type="number" value="1" min="1" max="9" aria-label="Jumlah JBL Flip 6"></label>
+            <a class="remove" href="cart.html" aria-label="Hapus JBL Flip 6 dari keranjang">Hapus</a>
+          </div>
+        </article>
+      </section>
+      <aside class="summary" aria-labelledby="summary-title">
+        <h2 id="summary-title">Ringkasan</h2>
+        <p class="summary-row"><span>Subtotal</span><span>Rp6.098.000</span></p>
+        <p class="summary-row"><span>Pengiriman</span><span>Dihitung saat checkout</span></p>
+        <p class="summary-row summary-total"><span>Total</span><span>Rp6.098.000</span></p>
+        <button class="btn btn-block" type="button" disabled aria-describedby="checkout-note">Checkout</button>
+        <p class="notice" id="checkout-note">Checkout dan pembayaran tidak termasuk dalam prototipe ini.</p>
+        <a class="text-link" href="categories.html">Lanjut belanja →</a>
+      </aside>
+    </div>
+    <p class="notice notice-spaced">Prototipe statis: perubahan jumlah dan hapus item tidak tersimpan setelah halaman dimuat ulang.</p>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><a class="logo" href="index.html">Sound<span>Hub</span></a><p>Audio yang tepat untuk setiap ruang dan ritme.</p></div>
+      <nav class="footer-nav" aria-label="Navigasi footer"><a href="categories.html">Kategori</a><a href="brands.html">Brand</a><a href="cart.html">Keranjang</a><a href="login.html">Masuk</a></nav><p>© 2026 SoundHub. Prototipe UI.</p>
+    </div>
+  </footer>
+</body>
+</html>

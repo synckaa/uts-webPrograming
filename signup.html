@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daftar — SoundHub</title>
+  <meta name="description" content="Buat akun SoundHub untuk menyimpan keranjang dan mempermudah belanja produk audio.">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/base.css"><link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css"><link rel="stylesheet" href="css/pages.css">
+</head>
+<body>
+  <a class="skip" href="#main">Lewati ke konten</a>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="logo" href="index.html">Sound<span>Hub</span></a>
+      <nav class="primary-nav" aria-label="Navigasi utama">
+        <a href="index.html">Home</a>
+        <a href="categories.html">Kategori</a>
+        <a href="brands.html">Brand</a>
+      </nav>
+      <form class="search" action="search.html" role="search">
+        <label class="sr-only" for="q">Cari produk audio</label>
+        <input id="q" name="q" type="search" placeholder="Cari headphone, speaker…" required>
+        <button type="submit" aria-label="Cari"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></svg></button>
+      </form>
+      <div class="header-actions">
+        <a class="cart" href="cart.html" aria-label="Keranjang belanja"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg></a>
+        <a class="btn btn-small btn-ghost" href="login.html">Masuk</a>
+        <a class="btn btn-small" href="signup.html" aria-current="page">Daftar</a>
+      </div>
+    </div>
+  </header>
+  <main id="main" class="container auth">
+    <div class="auth-copy">
+      <p class="eyebrow">Mulai dari sini</p>
+      <h1>Buat akun SoundHub.</h1>
+      <p class="lead">Satu akun untuk menyimpan keranjang, memantau stok, dan melanjutkan belanja kapan saja.</p>
+      <ul class="auth-list">
+        <li>Gratis dan hanya butuh satu menit.</li>
+        <li>Keranjang tersimpan di semua perangkat.</li>
+        <li>Emailmu tidak dibagikan ke pihak lain.</li>
+      </ul>
+    </div>
+    <section class="auth-panel" aria-labelledby="signup-title">
+      <h2 id="signup-title">Daftar</h2>
+      <p class="muted">Isi data di bawah untuk membuat akun.</p>
+      <form class="auth-form" action="cart.html" method="get">
+        <label class="field"><span>Nama</span><input class="input" type="text" autocomplete="name" placeholder="Nama lengkap" required></label>
+        <label class="field"><span>Email</span><input class="input" type="email" autocomplete="email" placeholder="nama@email.com" required></label>
+        <label class="field"><span>Password</span><input class="input" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter" minlength="8" required></label>
+        <button class="btn btn-block" type="submit">Buat akun</button>
+      </form>
+      <p class="auth-alt">Sudah punya akun? <a href="login.html">Masuk</a></p>
+      <p class="notice notice-spaced">Prototipe UI — data tidak dikirim ke server.</p>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div><a class="logo" href="index.html">Sound<span>Hub</span></a><p>Audio yang tepat untuk setiap ruang dan ritme.</p></div>
+      <nav class="footer-nav" aria-label="Navigasi footer"><a href="categories.html">Kategori</a><a href="brands.html">Brand</a><a href="cart.html">Keranjang</a><a href="login.html">Masuk</a></nav><p>© 2026 SoundHub. Prototipe UI.</p>
+    </div>
+  </footer>
+</body>
+</html>
